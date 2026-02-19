@@ -29,6 +29,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     // TODO: Create campgrounds list
+    private val campgrounds = mutableListOf<Campground>()
+    private lateinit var campgroundAdapter: CampgroundAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +43,8 @@ class MainActivity : AppCompatActivity() {
 
         // TODO: Set up CampgroundAdapter with campgrounds
 
+        campgroundAdapter = CampgroundAdapter(this, campgrounds)
+        campgroundsRecyclerView.adapter = campgroundAdapter
 
         campgroundsRecyclerView.layoutManager = LinearLayoutManager(this).also {
             val dividerItemDecoration = DividerItemDecoration(this, it.orientation)
@@ -63,10 +67,18 @@ class MainActivity : AppCompatActivity() {
                 try {
                     // TODO: Create the parsedJSON
 
+                    val parsedJSON = createJson().decodeFromString(
+                        CampgroundResponse.serializer(),
+                        json.jsonObject.toString()
+                    )
                     // TODO: Do something with the returned json (contains campground information)
 
+                    parsedJSON.data?.let { list ->
+                        campgrounds.addAll(list)
+                    }
                     // TODO: Save the campgrounds and reload the screen
 
+                    campgroundAdapter.notifyDataSetChanged()
                 } catch (e: JSONException) {
                     Log.e(TAG, "Exception: $e")
                 }
